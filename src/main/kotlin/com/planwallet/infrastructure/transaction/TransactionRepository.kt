@@ -2,6 +2,7 @@
 
 import com.planwallet.domain.transaction.Transaction
 import org.springframework.data.jpa.repository.JpaRepository
+import java.time.Instant
 
 /**
  * 거래 JPA 리포지토리.
@@ -16,4 +17,9 @@ interface TransactionRepository : JpaRepository<Transaction, Long> {
      * 사용자별 거래 단건 조회.
      */
     fun findByIdAndUserId(id: Long, userId: Long): Transaction?
+
+    /**
+     * 사용자별 기간 내 거래 조회.
+     */
+    fun findAllByUserIdAndOccurredAtBetween(userId: Long, from: Instant, to: Instant): List<Transaction>
 }
