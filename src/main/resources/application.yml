@@ -4,6 +4,16 @@
   messages:
     basename: i18n/messages
     encoding: UTF-8
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/planwallet?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:planwallet}
+    password: ${SPRING_DATASOURCE_PASSWORD:planwallet}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
 
 jwt:
   issuer: plan-wallet
