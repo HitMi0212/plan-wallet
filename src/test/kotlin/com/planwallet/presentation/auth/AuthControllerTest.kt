@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 
 /**
  * AuthController 단위 테스트(MockMvc standalone).
@@ -31,9 +30,7 @@ class AuthControllerTest {
         objectMapper = ObjectMapper().findAndRegisterModules()
 
         val controller = AuthController(authService)
-        mockMvc = MockMvcBuilders.standaloneSetup(controller)
-            .setMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
-            .build()
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build()
     }
 
     @Test

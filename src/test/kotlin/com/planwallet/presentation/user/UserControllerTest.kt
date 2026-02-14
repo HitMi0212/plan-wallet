@@ -9,7 +9,6 @@ import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -32,9 +31,7 @@ class UserControllerTest {
         objectMapper = ObjectMapper().findAndRegisterModules()
 
         val controller = UserController(userService)
-        mockMvc = MockMvcBuilders.standaloneSetup(controller)
-            .setMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
-            .build()
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build()
     }
 
     @Test
