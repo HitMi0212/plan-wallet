@@ -1,4 +1,7 @@
-﻿spring:
+﻿server:
+  port: 17500
+
+spring:
   config:
     activate:
       on-profile: prod

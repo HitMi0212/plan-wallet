@@ -1,4 +1,7 @@
-﻿spring:
+﻿server:
+  port: 17500
+
+spring:
   profiles:
     active: local
   application:
