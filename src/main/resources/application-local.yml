@@ -1,0 +1,17 @@
+﻿spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:mysql://localhost:3306/planwallet?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: planwallet
+    password: planwallet
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
