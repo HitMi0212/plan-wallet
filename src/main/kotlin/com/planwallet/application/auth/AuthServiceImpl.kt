@@ -1,5 +1,6 @@
-﻿package com.planwallet.domain.auth.service
+﻿package com.planwallet.application.auth
 
+import com.planwallet.domain.auth.TokenPair
 import com.planwallet.global.security.JwtTokenProvider
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service

@@ -1,4 +1,4 @@
-﻿package com.planwallet.domain.auth.controller.dto
+﻿package com.planwallet.presentation.auth.dto
 
 data class TokenResponse(
     val accessToken: String,

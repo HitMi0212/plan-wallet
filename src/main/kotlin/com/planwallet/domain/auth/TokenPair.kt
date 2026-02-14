@@ -1,4 +1,4 @@
-﻿package com.planwallet.domain.auth.service
+﻿package com.planwallet.domain.auth
 
 data class TokenPair(
     val accessToken: String,

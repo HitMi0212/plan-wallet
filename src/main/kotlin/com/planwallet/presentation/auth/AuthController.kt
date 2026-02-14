@@ -1,9 +1,9 @@
-﻿package com.planwallet.domain.auth.controller
+﻿package com.planwallet.presentation.auth
 
-import com.planwallet.domain.auth.service.AuthService
-import com.planwallet.domain.auth.controller.dto.LoginRequest
-import com.planwallet.domain.auth.controller.dto.RefreshRequest
-import com.planwallet.domain.auth.controller.dto.TokenResponse
+import com.planwallet.application.auth.AuthService
+import com.planwallet.presentation.auth.dto.LoginRequest
+import com.planwallet.presentation.auth.dto.RefreshRequest
+import com.planwallet.presentation.auth.dto.TokenResponse
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
