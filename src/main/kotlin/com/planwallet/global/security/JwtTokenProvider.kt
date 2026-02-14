@@ -27,6 +27,8 @@ class JwtTokenProvider(
         return createToken(subject, TokenType.REFRESH)
     }
 
+    fun getSubject(token: String): String = parseClaims(token).subject
+
     fun getAuthentication(token: String): Authentication {
         val claims = parseClaims(token)
         val subject = claims.subject
@@ -40,6 +42,8 @@ class JwtTokenProvider(
 
         return UsernamePasswordAuthenticationToken(subject, token, authorities)
     }
+
+    fun isRefreshToken(token: String): Boolean = getTokenType(token) == TokenType.REFRESH
 
     fun isValid(token: String): Boolean {
         return try {
@@ -65,6 +69,11 @@ class JwtTokenProvider(
             .claim("typ", type.value)
             .signWith(key, SignatureAlgorithm.HS256)
             .compact()
+    }
+
+    private fun getTokenType(token: String): TokenType? {
+        val type = parseClaims(token)["typ"]?.toString()?.lowercase()
+        return TokenType.entries.firstOrNull { it.value == type }
     }
 
     private fun parseClaims(token: String): Claims {
