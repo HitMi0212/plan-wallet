@@ -1,5 +1,6 @@
 ﻿package com.planwallet.global.error
 
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.ConstraintViolationException
 import org.springframework.context.MessageSource
 import org.springframework.http.HttpStatus
@@ -9,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.server.ResponseStatusException
+import java.time.Instant
 import java.util.Locale
 
 /**
@@ -21,6 +23,7 @@ class GlobalExceptionHandler(
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(
         ex: MethodArgumentNotValidException,
+        request: HttpServletRequest,
         locale: Locale,
     ): ResponseEntity<ApiErrorResponse> {
         val fieldError = ex.bindingResult.fieldErrors.firstOrNull()
@@ -30,12 +33,13 @@ class GlobalExceptionHandler(
 
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
-            .body(ApiErrorResponse(code = code, message = message))
+            .body(errorResponse(code, message, HttpStatus.BAD_REQUEST, request))
     }
 
     @ExceptionHandler(ConstraintViolationException::class)
     fun handleConstraintViolation(
         ex: ConstraintViolationException,
+        request: HttpServletRequest,
         locale: Locale,
     ): ResponseEntity<ApiErrorResponse> {
         val code = "error.validation"
@@ -44,12 +48,13 @@ class GlobalExceptionHandler(
 
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
-            .body(ApiErrorResponse(code = code, message = message))
+            .body(errorResponse(code, message, HttpStatus.BAD_REQUEST, request))
     }
 
     @ExceptionHandler(ResponseStatusException::class)
     fun handleResponseStatusException(
         ex: ResponseStatusException,
+        request: HttpServletRequest,
         locale: Locale,
     ): ResponseEntity<ApiErrorResponse> {
         val status = ex.statusCode
@@ -57,21 +62,23 @@ class GlobalExceptionHandler(
         val message = ex.reason
             ?: messageSource.getMessage(code, null, locale)
 
+        val httpStatus = HttpStatus.valueOf(status.value())
         return ResponseEntity
-            .status(status)
-            .body(ApiErrorResponse(code = code, message = message))
+            .status(httpStatus)
+            .body(errorResponse(code, message, httpStatus, request))
     }
 
     @ExceptionHandler(Exception::class)
     fun handleUnhandled(
         ex: Exception,
+        request: HttpServletRequest,
         locale: Locale,
     ): ResponseEntity<ApiErrorResponse> {
         val code = "error.internal"
         val message = messageSource.getMessage(code, null, locale)
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ApiErrorResponse(code = code, message = message))
+            .body(errorResponse(code, message, HttpStatus.INTERNAL_SERVER_ERROR, request))
     }
 
     private fun statusToCode(status: Int): String = when (status) {
@@ -84,7 +91,21 @@ class GlobalExceptionHandler(
     }
 
     private fun resolveFieldErrorMessage(fieldError: FieldError, locale: Locale): String {
-        val args = fieldError.arguments
         return messageSource.getMessage(fieldError, locale)
+    }
+
+    private fun errorResponse(
+        code: String,
+        message: String,
+        status: HttpStatus,
+        request: HttpServletRequest,
+    ): ApiErrorResponse {
+        return ApiErrorResponse(
+            code = code,
+            message = message,
+            status = status.value(),
+            path = request.requestURI,
+            timestamp = Instant.now(),
+        )
     }
 }

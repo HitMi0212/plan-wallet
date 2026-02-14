@@ -2,6 +2,7 @@
 
 import com.planwallet.application.stats.StatsService
 import com.planwallet.presentation.stats.dto.CategoryTotalResponse
+import com.planwallet.presentation.stats.dto.MonthlyComparisonResponse
 import com.planwallet.presentation.stats.dto.MonthlySummaryResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
@@ -44,6 +45,29 @@ class StatsController(
             month = summary.month,
             incomeTotal = summary.incomeTotal,
             expenseTotal = summary.expenseTotal,
+        )
+    }
+
+    /**
+     * 전월 대비 월간 합계.
+     */
+    @Operation(summary = "월간 비교", description = "전월 대비 월간 합계를 반환합니다.")
+    @GetMapping("/monthly/compare")
+    fun monthlyCompare(
+        authentication: Authentication,
+        @RequestParam("year") year: Int,
+        @RequestParam("month") @Min(1) @Max(12) month: Int,
+    ): MonthlyComparisonResponse {
+        val userId = authentication.name.toLongOrNull()
+            ?: throw IllegalStateException("Invalid authentication subject")
+        val summary = statsService.monthlyComparison(userId, year, month)
+        return MonthlyComparisonResponse(
+            year = summary.year,
+            month = summary.month,
+            incomeTotal = summary.incomeTotal,
+            expenseTotal = summary.expenseTotal,
+            prevIncomeTotal = summary.prevIncomeTotal,
+            prevExpenseTotal = summary.prevExpenseTotal,
         )
     }
 

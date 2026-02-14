@@ -1,7 +1,7 @@
 ﻿package com.planwallet.presentation.stats
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.planwallet.application.stats.CategoryTotal
+import com.planwallet.application.stats.MonthlyComparison
 import com.planwallet.application.stats.MonthlySummary
 import com.planwallet.application.stats.StatsService
 import io.mockk.every
@@ -40,6 +40,18 @@ class StatsControllerTest {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.incomeTotal").value(1000))
             .andExpect(jsonPath("$.expenseTotal").value(500))
+    }
+
+    @Test
+    fun `monthly compare returns summary`() {
+        every { statsService.monthlyComparison(1L, 2025, 1) } returns MonthlyComparison(2025, 1, 1000, 500, 800, 400)
+
+        val principal = TestingAuthenticationToken("1", "credentials")
+
+        mockMvc.perform(get("/plan/stats/monthly/compare?year=2025&month=1").principal(principal))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.incomeTotal").value(1000))
+            .andExpect(jsonPath("$.prevIncomeTotal").value(800))
     }
 
     @Test

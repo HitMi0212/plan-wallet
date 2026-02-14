@@ -21,6 +21,18 @@ data class CategoryTotal(
 )
 
 /**
+ * 월간 비교 응답 모델.
+ */
+data class MonthlyComparison(
+    val year: Int,
+    val month: Int,
+    val incomeTotal: Long,
+    val expenseTotal: Long,
+    val prevIncomeTotal: Long,
+    val prevExpenseTotal: Long,
+)
+
+/**
  * 통계 유스케이스 정의.
  */
 interface StatsService {
@@ -33,4 +45,9 @@ interface StatsService {
      * 카테고리별 합계.
      */
     fun categoryTotals(userId: Long, from: LocalDate, to: LocalDate): List<CategoryTotal>
+
+    /**
+     * 전월 대비 월간 비교.
+     */
+    fun monthlyComparison(userId: Long, year: Int, month: Int): MonthlyComparison
 }

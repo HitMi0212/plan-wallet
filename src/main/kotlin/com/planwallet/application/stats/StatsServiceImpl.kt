@@ -17,20 +17,7 @@ class StatsServiceImpl(
      * 월간 수입/지출 합계를 계산한다.
      */
     override fun monthlySummary(userId: Long, year: Int, month: Int): MonthlySummary {
-        val start = LocalDate.of(year, month, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
-        val end = LocalDate.of(year, month, 1)
-            .plusMonths(1)
-            .atStartOfDay()
-            .toInstant(ZoneOffset.UTC)
-
-        val transactions = transactionRepository.findAllByUserIdAndOccurredAtBetween(userId, start, end)
-
-        val income = transactions
-            .filter { it.type == TransactionType.INCOME }
-            .sumOf { it.amount }
-        val expense = transactions
-            .filter { it.type == TransactionType.EXPENSE }
-            .sumOf { it.amount }
+        val (income, expense) = sumByType(userId, year, month)
 
         return MonthlySummary(
             year = year,
@@ -55,5 +42,43 @@ class StatsServiceImpl(
                 CategoryTotal(categoryId, items.sumOf { it.amount })
             }
             .sortedByDescending { it.total }
+    }
+
+    /**
+     * 전월 대비 월간 합계를 계산한다.
+     */
+    override fun monthlyComparison(userId: Long, year: Int, month: Int): MonthlyComparison {
+        val (income, expense) = sumByType(userId, year, month)
+
+        val prevYearMonth = LocalDate.of(year, month, 1).minusMonths(1)
+        val (prevIncome, prevExpense) = sumByType(userId, prevYearMonth.year, prevYearMonth.monthValue)
+
+        return MonthlyComparison(
+            year = year,
+            month = month,
+            incomeTotal = income,
+            expenseTotal = expense,
+            prevIncomeTotal = prevIncome,
+            prevExpenseTotal = prevExpense,
+        )
+    }
+
+    private fun sumByType(userId: Long, year: Int, month: Int): Pair<Long, Long> {
+        val start = LocalDate.of(year, month, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
+        val end = LocalDate.of(year, month, 1)
+            .plusMonths(1)
+            .atStartOfDay()
+            .toInstant(ZoneOffset.UTC)
+
+        val transactions = transactionRepository.findAllByUserIdAndOccurredAtBetween(userId, start, end)
+
+        val income = transactions
+            .filter { it.type == TransactionType.INCOME }
+            .sumOf { it.amount }
+        val expense = transactions
+            .filter { it.type == TransactionType.EXPENSE }
+            .sumOf { it.amount }
+
+        return income to expense
     }
 }

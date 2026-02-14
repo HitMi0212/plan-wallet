@@ -34,6 +34,26 @@ class StatsServiceImplTest {
     }
 
     @Test
+    fun `monthlyComparison compares previous month`() {
+        val current = listOf(
+            Transaction(1L, TransactionType.INCOME, 1000, 10L, null, Instant.parse("2025-01-01T00:00:00Z")),
+            Transaction(1L, TransactionType.EXPENSE, 200, 11L, null, Instant.parse("2025-01-05T00:00:00Z")),
+        )
+        val previous = listOf(
+            Transaction(1L, TransactionType.INCOME, 800, 10L, null, Instant.parse("2024-12-01T00:00:00Z")),
+            Transaction(1L, TransactionType.EXPENSE, 100, 11L, null, Instant.parse("2024-12-05T00:00:00Z")),
+        )
+        every { transactionRepository.findAllByUserIdAndOccurredAtBetween(1L, any(), any()) } returnsMany listOf(current, previous)
+
+        val summary = statsService.monthlyComparison(1L, 2025, 1)
+
+        assertEquals(1000, summary.incomeTotal)
+        assertEquals(200, summary.expenseTotal)
+        assertEquals(800, summary.prevIncomeTotal)
+        assertEquals(100, summary.prevExpenseTotal)
+    }
+
+    @Test
     fun `categoryTotals aggregates by category`() {
         val transactions = listOf(
             Transaction(1L, TransactionType.EXPENSE, 200, 11L, null, Instant.parse("2025-01-05T00:00:00Z")),
