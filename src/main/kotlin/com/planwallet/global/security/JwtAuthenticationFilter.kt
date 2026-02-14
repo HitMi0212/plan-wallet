@@ -8,6 +8,9 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
+/**
+ * JWT 인증 필터.
+ */
 @Component
 class JwtAuthenticationFilter(
     private val tokenProvider: JwtTokenProvider,

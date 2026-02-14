@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotBlank
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.validation.annotation.Validated
 
+/**
+ * JWT 설정 프로퍼티.
+ */
 @Validated
 @ConfigurationProperties("jwt")
 data class JwtProperties(
