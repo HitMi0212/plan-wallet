@@ -29,6 +29,8 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-test")
+    testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("io.mockk:mockk:1.13.13")
 }
