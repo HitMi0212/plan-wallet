@@ -1,8 +1,11 @@
 ﻿package com.planwallet.application.auth
 
+import com.planwallet.domain.auth.RefreshToken
 import com.planwallet.domain.auth.TokenPair
 import com.planwallet.domain.user.User
+import com.planwallet.global.security.JwtProperties
 import com.planwallet.global.security.JwtTokenProvider
+import com.planwallet.infrastructure.auth.RefreshTokenRepository
 import com.planwallet.infrastructure.user.UserRepository
 import io.mockk.every
 import io.mockk.mockk
@@ -13,7 +16,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.server.ResponseStatusException
-import java.util.Optional
 
 /**
  * AuthServiceImpl 단위 테스트.
@@ -22,11 +24,20 @@ class AuthServiceImplTest {
     private val tokenProvider = mockk<JwtTokenProvider>()
     private val userRepository = mockk<UserRepository>()
     private val passwordEncoder = mockk<PasswordEncoder>()
+    private val refreshTokenRepository = mockk<RefreshTokenRepository>()
+    private val jwtProperties = JwtProperties(
+        issuer = "plan-wallet",
+        secret = "plan-wallet-dev-secret-please-change-32bytes",
+        accessTokenMinutes = 30,
+        refreshTokenDays = 14,
+    )
 
     private val authService = AuthServiceImpl(
         tokenProvider = tokenProvider,
         userRepository = userRepository,
         passwordEncoder = passwordEncoder,
+        refreshTokenRepository = refreshTokenRepository,
+        jwtProperties = jwtProperties,
     )
 
     @Test
@@ -41,6 +52,8 @@ class AuthServiceImplTest {
         every { passwordEncoder.matches("P@ssw0rd123", "hash") } returns true
         every { tokenProvider.createAccessToken("1") } returns "access"
         every { tokenProvider.createRefreshToken("1") } returns "refresh"
+        every { refreshTokenRepository.deleteAllByUserId(1L) } returns Unit
+        every { refreshTokenRepository.save(any()) } answers { firstArg() }
 
         val result = authService.login("user@example.com", "P@ssw0rd123")
 
@@ -93,8 +106,11 @@ class AuthServiceImplTest {
         every { tokenProvider.isValid("refresh") } returns true
         every { tokenProvider.isRefreshToken("refresh") } returns true
         every { tokenProvider.getSubject("refresh") } returns "1"
+        every { refreshTokenRepository.findByToken("refresh") } returns RefreshToken(1L, "refresh", java.time.Instant.now())
         every { tokenProvider.createAccessToken("1") } returns "access"
         every { tokenProvider.createRefreshToken("1") } returns "refresh2"
+        every { refreshTokenRepository.deleteAllByUserId(1L) } returns Unit
+        every { refreshTokenRepository.save(any()) } answers { firstArg() }
 
         val result = authService.refresh("refresh")
 
