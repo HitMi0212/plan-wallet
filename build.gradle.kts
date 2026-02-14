@@ -57,3 +57,11 @@ sourceSets {
 springBoot {
     mainClass.set("com.planwallet.PlanWalletApplicationKt")
 }
+
+tasks.named<Copy>("processResources") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.named<Copy>("processTestResources") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
